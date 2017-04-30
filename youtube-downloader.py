@@ -17,36 +17,25 @@ class MainFrame(Frame):
         self.master.config(menu=menubar)
 
         filemenu = Menu(menubar)
-        aboutmenu = Menu(menubar)
 
-        filemenu.add_command(label="New")
-        filemenu.add_command(label="Save")
-        filemenu.add_command(label="Save As")
-        filemenu.add_command(label="Edit")
-        filemenu.add_separator()
         filemenu.add_command(label="Exit", command=self.do_exit)
 
-        aboutmenu.add_command(label="About Us")
-        aboutmenu.add_command(label="Help",command =self.newFrame)
-
         menubar.add_cascade(label="File",menu=filemenu)
-        menubar.add_cascade(label="About", menu=aboutmenu)
 
         input_label = Label(self,text="YouTube Video Url:").pack()
         self.input_box = Entry(self,width=100)
         self.input_box.bind('<Return>',self.startFetch)
         self.input_box.pack()
+
         self.inp_btn = Button(self,text="Fetch",command = self.startFetch)
         self.inp_btn.pack()
+
         self.inp_btn.bind('<Return>',self.startFetch)
-        self.firsttime = True
         self.video_title=Label(self)
         self.randomLabel=Label(self)
         self.video_duration=Label(self)
         self.buttons=[]
-    def newFrame(self):
-        frm = Frame(self)
-        frm.pack(fill=BOTH,expand=1)
+
     def clearButtons(self):
         for button in self.buttons:
             button.destroy()
@@ -77,7 +66,6 @@ class MainFrame(Frame):
         if not videoname in os.listdir('./Downloads'):
             stream.download(filepath="Downloads/")
         os.startfile(os.getcwd()+"/Downloads")
-
 
     def do_exit(self):
         exit()
