@@ -4,4 +4,5 @@
 
 
 ## To be done:
-- Add Download Status
+- ~~Add Download Status~~
+- Add Playlist downloading capability
