@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import ttk
+from tkinter.ttk import *
 import pafy
 import os
 
@@ -26,6 +26,7 @@ class MainFrame(Frame):
         self.input_box = Entry(self,width=100)
         self.input_box.bind('<Return>',self.startFetch)
         self.input_box.pack()
+        self.input_box.focus_set()
 
         self.inp_btn = Button(self,text="Fetch",command = self.startFetch)
         self.inp_btn.pack()
@@ -34,6 +35,8 @@ class MainFrame(Frame):
         self.video_title=Label(self)
         self.randomLabel=Label(self)
         self.video_duration=Label(self)
+        self.downloadStatus = Label( self )
+        self.progbar = Progressbar(self)
         self.buttons=[]
 
     def clearButtons(self):
@@ -41,7 +44,11 @@ class MainFrame(Frame):
             button.destroy()
 
     def startFetch(self,*args):
+        self.inp_btn["text"] = "Fetching...Please Wait"
+        root.update()
         self.clearButtons()
+        self.progbar.destroy()
+        self.downloadStatus["text"]=""
         self.url = self.input_box.get()
         video = pafy.new(self.url)
         self.video_title ["text"]="Title-"+video.title
@@ -51,22 +58,42 @@ class MainFrame(Frame):
         self.randomLabel["text"]="Downloads:"
         self.randomLabel.pack()
         self.buttons = []
+        self.progbar = Progressbar(self,orient="horizontal",mode="determinate")
+
+        self.downloadStatus.pack()
+        self.progbar.pack()
+
         streams = video.streams
 
         for stream in streams:
             size = str(stream.get_filesize()/10**6).split(".")[0]+"."+str(stream.get_filesize()/10**6).split(".")[1][:2]
-            self.buttons.append(Button(self,width=20,text=stream.resolution+" "+stream.extension+" "+size+"MB",command=lambda stream=stream:self.downloadfrom(stream)))
+            self.buttons.append(Button(self,width=40,text=stream.resolution+" "+stream.extension+" "+size+"MB",command=lambda stream=stream:self.downloadfrom(stream)))
         for button in self.buttons:
             button.pack()
 
+        self.inp_btn["text"] = "Fetch"
+        root.update()
+
     def downloadfrom(self,stream):
+        self.downloadStatus["text"] = "Downloading - "
         videoname = stream.title+"."+stream.extension
         if not "Downloads" in os.listdir():
             os.mkdir("Downloads")
         if not videoname in os.listdir('./Downloads'):
-            stream.download(filepath="Downloads/")
+            stream.download(filepath="Downloads/",quiet=False,callback=self.mycb)
         os.startfile(os.getcwd()+"/Downloads")
+        self.downloadStatus["text"]="Download Completed"
 
+    def mycb(self,total, recvd, ratio, rate, eta):
+        kbps = str(rate*0.125).split(".")
+        speed = kbps[0]+"."+kbps[1][:2]
+        raw_time_min = int(eta/60)
+        raw_time_sec = int(eta%60)
+        str_time = str(raw_time_min)+"min:"+str(raw_time_sec)+"sec"
+        self.downloadStatus["text"]="Downloading -"+str(ratio*100)[:4]+"% "+speed+" kB/s "+str_time
+        self.progbar["value"]=ratio*100
+        root.update()
+        # self.downloadStatus["text"] = str(ratio*100)[:4]
     def do_exit(self):
         exit()
 
