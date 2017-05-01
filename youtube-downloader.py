@@ -59,7 +59,6 @@ class MainFrame(Frame):
         self.randomLabel.pack()
         self.buttons = []
         self.progbar = Progressbar(self,orient="horizontal",mode="determinate")
-
         self.downloadStatus.pack()
         self.progbar.pack()
 
@@ -93,7 +92,7 @@ class MainFrame(Frame):
         self.downloadStatus["text"]="Downloading -"+str(ratio*100)[:4]+"% "+speed+" kB/s "+str_time
         self.progbar["value"]=ratio*100
         root.update()
-        # self.downloadStatus["text"] = str(ratio*100)[:4]
+        
     def do_exit(self):
         exit()
 
